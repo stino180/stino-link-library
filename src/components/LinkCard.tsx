@@ -92,19 +92,16 @@ export function LinkCard({ card, index }: LinkCardProps) {
           className="w-full bg-apple-blue hover:bg-apple-blue-hover text-white shadow-sm hover:shadow-glow transition-all group-hover:animate-glow-pulse"
           size="sm"
         >
-          <span className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             {card.href.startsWith('mailto:') ? (
-              <>
-                <Mail className="h-4 w-4" />
-                Contact
-              </>
+              <Mail className="h-4 w-4" />
             ) : (
-              <>
-                <ExternalLink className="h-4 w-4" />
-                Open Link
-              </>
+              <ExternalLink className="h-4 w-4" />
             )}
-          </span>
+            <span>
+              {card.href.startsWith('mailto:') ? 'Contact' : 'Open Link'}
+            </span>
+          </div>
         </Button>
       </div>
     </div>
