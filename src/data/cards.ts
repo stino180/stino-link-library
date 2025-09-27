@@ -43,8 +43,8 @@ export const linkCards: LinkCard[] = [
   },
   {
     id: 'booking',
-    title: 'Booking & Inquiries',
-    subtitle: 'Shows, features, freelance gigs.',
+    title: 'Vizi',
+    subtitle: 'Clothing brand by Justin',
     href: 'mailto:booking@example.com',
     image: 'booking',
     category: 'Contact',
