@@ -52,9 +52,9 @@ export const linkCards: LinkCard[] = [
   },
   {
     id: 'merch',
-    title: 'Merch / Tabby City',
-    subtitle: 'Cat-themed tees & drops.',
-    href: 'https://example.com/tabbycity',
+    title: 'Zmove',
+    subtitle: 'Sports social media app.',
+    href: 'https://zmove.xyz',
     image: 'merch',
     category: 'Projects',
     badge: 'Drop',
