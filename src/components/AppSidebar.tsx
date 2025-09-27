@@ -51,8 +51,10 @@ export function AppSidebar({ activeCategory, onCategoryChange }: AppSidebarProps
                         : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                     }`}
                   >
-                    <category.icon className={`h-4 w-4 ${isCollapsed ? 'mx-auto' : 'mr-2'}`} />
-                    {!isCollapsed && <span>{category.title}</span>}
+                    <div className="flex items-center">
+                      <category.icon className={`h-4 w-4 ${isCollapsed ? 'mx-auto' : 'mr-2'}`} />
+                      {!isCollapsed && <span>{category.title}</span>}
+                    </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
