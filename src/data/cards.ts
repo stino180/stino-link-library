@@ -15,9 +15,9 @@ export interface LinkCard {
 export const linkCards: LinkCard[] = [
   {
     id: 'music-site',
-    title: 'Music Site',
+    title: 'My music',
     subtitle: 'Stream my latest tracks & releases.',
-    href: 'https://example.com/music',
+    href: 'https://untd.io/stino',
     image: 'music',
     category: 'Music',
     badge: 'New',
