@@ -35,7 +35,7 @@ export const linkCards: LinkCard[] = [
   {
     id: 'portfolio',
     title: 'Freelance Portfolio',
-    subtitle: 'Web design/dev work and case studies.',
+    subtitle: 'Web design/dev work for clients.',
     href: 'https://example.com/portfolio',
     image: 'portfolio',
     category: 'Portfolio',
