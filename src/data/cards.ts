@@ -27,7 +27,7 @@ export const linkCards: LinkCard[] = [
     id: 'youtube',
     title: '180 Recordings LLC',
     subtitle: 'Label info and merch.',
-    href: 'https://youtube.com/@stino180',
+    href: 'https://180recordings.org',
     image: 'youtube',
     category: 'Video',
     external: true,
