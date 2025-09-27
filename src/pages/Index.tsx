@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { Menu } from 'lucide-react'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { Button } from '@/components/ui/button'
 import { Header } from '@/components/Header'
 import { AppSidebar } from '@/components/AppSidebar'
 import { SearchFilter } from '@/components/SearchFilter'
@@ -27,11 +25,7 @@ const Index = () => {
           <main className="flex-1 min-h-screen">
             {/* Mobile Sidebar Trigger */}
             <div className="md:hidden p-4 border-b border-chrome-border">
-              <SidebarTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SidebarTrigger>
+              <SidebarTrigger className="h-9 w-9 p-0" />
             </div>
 
             <div className="container px-6 py-8">
