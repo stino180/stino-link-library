@@ -45,26 +45,14 @@ export function LinkCard({ card, index }: LinkCardProps) {
 
   const imageUrl = imageMap[card.image as keyof typeof imageMap] || musicImg
 
-  // Varying wire lengths for organic feel
-  const wireLength = 60 + (index % 3) * 20
-
   return (
     <article
-      className="group relative shrink-0 opacity-0 animate-gallery-fade-in cursor-pointer flex flex-col items-center"
+      className="group relative shrink-0 opacity-0 animate-gallery-fade-in cursor-pointer artwork-spotlight"
       style={{ animationDelay: `${index * 100}ms` }}
       onClick={handleClick}
     >
-      {/* Hanging Wire */}
-      <div 
-        className="w-px bg-gradient-to-b from-muted-foreground/40 via-muted-foreground/60 to-muted-foreground/80"
-        style={{ height: `${wireLength}px` }}
-      />
-      
-      {/* Wire connection point */}
-      <div className="w-2 h-2 rounded-full bg-muted-foreground/60 -mt-0.5 mb-1" />
-
-      {/* The Frame */}
-      <div className="relative w-[280px] md:w-[340px] artwork-frame overflow-hidden bg-card shadow-frame transition-transform duration-500 ease-museum group-hover:scale-[1.02]">
+      {/* Wall-Mounted Frame */}
+      <div className="relative w-[280px] md:w-[320px] wall-mounted-frame overflow-hidden transition-all duration-500 ease-museum group-hover:scale-[1.02] group-hover:shadow-2xl">
         {/* Badge */}
         {card.badge && (
           <div className="absolute top-3 right-3 z-10">
@@ -95,16 +83,16 @@ export function LinkCard({ card, index }: LinkCardProps) {
         </div>
       </div>
 
-      {/* Museum Placard */}
-      <div className="mt-5 space-y-1.5 text-center">
-        <h2 className="font-serif text-lg md:text-xl font-medium text-foreground group-hover:text-foreground/80 transition-colors">
+      {/* Museum Placard - Small label below artwork */}
+      <div className="mt-6 space-y-1 text-center max-w-[280px] md:max-w-[320px]">
+        <h2 className="font-serif text-base md:text-lg font-medium text-foreground group-hover:text-foreground/80 transition-colors">
           {card.title}
         </h2>
-        <p className="text-sm tracking-wide text-muted-foreground font-light">
+        <p className="text-xs tracking-wide text-muted-foreground font-light">
           {card.subtitle}
         </p>
-        <div className="pt-1">
-          <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground/60">
+        <div className="pt-0.5">
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/60">
             {card.category}
           </span>
         </div>

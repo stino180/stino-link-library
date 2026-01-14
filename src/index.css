@@ -216,3 +216,202 @@
 .scrollbar-gallery::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* Realistic Gallery Room */
+.gallery-room {
+  position: relative;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+/* Gallery Wall - Realistic white museum wall */
+.gallery-wall {
+  background: linear-gradient(
+    180deg,
+    #f8f8f8 0%,
+    #fafafa 20%,
+    #f5f5f5 80%,
+    #e8e8e8 100%
+  );
+  position: relative;
+}
+
+.gallery-wall::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,0.02) 0%, transparent 30%, rgba(0,0,0,0.03) 100%);
+  pointer-events: none;
+}
+
+.dark .gallery-wall {
+  background: linear-gradient(
+    180deg,
+    #1a1a1a 0%,
+    #141414 20%,
+    #121212 80%,
+    #0a0a0a 100%
+  );
+}
+
+/* Track Lighting System */
+.track-lighting {
+  background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 50%, #2a2a2a 100%);
+  box-shadow: 
+    inset 0 2px 4px rgba(0,0,0,0.3),
+    0 2px 8px rgba(0,0,0,0.2);
+}
+
+.track-light {
+  width: 24px;
+  height: 32px;
+  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+  border-radius: 4px 4px 8px 8px;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.track-light::before {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 80px;
+  background: radial-gradient(ellipse at top, rgba(255,250,240,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.track-light::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 6px;
+  background: radial-gradient(ellipse, rgba(255,250,240,0.9) 0%, rgba(255,240,220,0.6) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255,250,240,0.5);
+}
+
+/* Artwork Spotlight Effect */
+.artwork-spotlight {
+  position: relative;
+}
+
+.artwork-spotlight::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200%;
+  height: 120px;
+  background: radial-gradient(ellipse 40% 100% at 50% 100%, rgba(255,252,245,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Wood Plank Floor */
+.gallery-floor {
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 150px,
+      rgba(0,0,0,0.03) 150px,
+      rgba(0,0,0,0.03) 151px
+    ),
+    linear-gradient(
+      180deg,
+      #9a8b7a 0%,
+      #8b7c6b 15%,
+      #7d6e5d 50%,
+      #6e5f4e 85%,
+      #5f5040 100%
+    );
+  position: relative;
+}
+
+.gallery-floor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      rgba(255,255,255,0.02) 2px,
+      transparent 4px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(0,0,0,0.02) 1px,
+      transparent 2px
+    );
+  pointer-events: none;
+}
+
+.gallery-floor::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.dark .gallery-floor {
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 150px,
+      rgba(0,0,0,0.1) 150px,
+      rgba(0,0,0,0.1) 151px
+    ),
+    linear-gradient(
+      180deg,
+      #3a3530 0%,
+      #2e2a25 15%,
+      #25221d 50%,
+      #1c1915 85%,
+      #141210 100%
+    );
+}
+
+/* Wall-mounted artwork frame */
+.wall-mounted-frame {
+  @apply bg-card;
+  border: 12px solid #fff;
+  box-shadow: 
+    0 0 0 1px rgba(0,0,0,0.08),
+    0 4px 6px rgba(0,0,0,0.04),
+    0 12px 24px rgba(0,0,0,0.08),
+    0 24px 48px rgba(0,0,0,0.04);
+  position: relative;
+}
+
+.wall-mounted-frame::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+  pointer-events: none;
+}
+
+.dark .wall-mounted-frame {
+  border-color: #1a1a1a;
+  box-shadow: 
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 4px 6px rgba(0,0,0,0.2),
+    0 12px 24px rgba(0,0,0,0.3),
+    0 24px 48px rgba(0,0,0,0.2);
+}
