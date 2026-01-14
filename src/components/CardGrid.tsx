@@ -23,17 +23,19 @@ export function CardGrid({ cards, searchQuery, activeCategory }: CardGridProps) 
 
   if (filteredCards.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-muted-foreground text-lg mb-2">No links found</div>
-        <p className="text-sm text-muted-foreground">
-          Try adjusting your search or filter criteria
+      <div className="text-center py-24">
+        <p className="font-serif text-2xl text-muted-foreground font-light italic">
+          No works found
+        </p>
+        <p className="mt-4 text-sm text-muted-foreground/60 tracking-wide">
+          Try adjusting your search or filter
         </p>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
+    <div className="space-y-24 md:space-y-32">
       {filteredCards.map((card, index) => (
         <LinkCard key={card.id} card={card} index={index} />
       ))}

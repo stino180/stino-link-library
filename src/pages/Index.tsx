@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Header } from '@/components/Header'
-import { AppSidebar } from '@/components/AppSidebar'
 import { SearchFilter } from '@/components/SearchFilter'
 import { CardGrid } from '@/components/CardGrid'
 import { Footer } from '@/components/Footer'
@@ -12,44 +10,47 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState('All')
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <div className="min-h-screen w-full bg-background-gradient">
-        <Header />
-        
-        <div className="flex w-full">
-          <AppSidebar 
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="pt-32 pb-16">
+        {/* Hero Section */}
+        <section className="container px-6 md:px-12 mb-20">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-foreground">
+              The Collection
+            </h1>
+            <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-xl mx-auto">
+              A curated exhibition of works, projects, and connections
+            </p>
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div className="container px-6 md:px-12 mb-16">
+          <div className="max-w-xs mx-auto border-t border-border/30" />
+        </div>
+
+        {/* Search and Filters */}
+        <section className="container px-6 md:px-12">
+          <SearchFilter
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
-          
-          <main className="flex-1 min-h-screen">
-            {/* Mobile Sidebar Trigger */}
-            <div className="md:hidden p-4 border-b border-chrome-border">
-              <SidebarTrigger className="h-9 w-9 p-0" />
-            </div>
 
-            <div className="container px-6 py-8">
-              {/* Search and Filters */}
-              <SearchFilter
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                activeCategory={activeCategory}
-                onCategoryChange={setActiveCategory}
-              />
-
-              {/* Cards Grid */}
-              <CardGrid
-                cards={linkCards}
-                searchQuery={searchQuery}
-                activeCategory={activeCategory}
-              />
-            </div>
-            
-            <Footer />
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+          {/* Gallery Cards */}
+          <CardGrid
+            cards={linkCards}
+            searchQuery={searchQuery}
+            activeCategory={activeCategory}
+          />
+        </section>
+      </main>
+      
+      <Footer />
+    </div>
   )
 }
 
