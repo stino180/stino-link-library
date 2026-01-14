@@ -27,16 +27,22 @@ const Index = () => {
 
         {/* Gallery Room */}
         <section className="flex-1 relative overflow-hidden">
-          {/* Gallery Wall Background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-muted/20" />
+          {/* Ceiling rail */}
+          <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-b from-muted/60 to-muted/20 shadow-sm" />
+          <div className="absolute top-3 left-0 right-0 h-px bg-border/40" />
           
-          {/* Floor line */}
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-muted/40 to-transparent" />
-          <div className="absolute bottom-24 left-0 right-0 h-px bg-border/30" />
+          {/* Gallery Wall Background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/10 via-background to-muted/30" />
+          
+          {/* Floor */}
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[hsl(30,20%,25%)] via-[hsl(30,15%,35%)] to-[hsl(30,10%,50%)]" />
+          <div className="absolute bottom-20 left-0 right-0 h-px bg-border/50" />
+          {/* Floor reflection */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-transparent to-white/5" />
           
           {/* Horizontal Scrolling Gallery */}
-          <div className="h-full py-12 overflow-x-auto overflow-y-hidden scrollbar-gallery">
-            <div className="h-full px-12 min-w-max">
+          <div className="h-full pt-0 pb-24 overflow-x-auto overflow-y-hidden scrollbar-gallery">
+            <div className="h-full px-12 min-w-max flex items-start">
               <CardGrid
                 cards={linkCards}
                 searchQuery={searchQuery}
