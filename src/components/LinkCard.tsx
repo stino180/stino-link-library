@@ -1,6 +1,5 @@
-import { ExternalLink, Mail } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Badge } from './Badge'
-import { Button } from '@/components/ui/button'
 import { LinkCard as LinkCardType } from '@/data/cards'
 
 // Import all card images
@@ -47,63 +46,60 @@ export function LinkCard({ card, index }: LinkCardProps) {
   const imageUrl = imageMap[card.image as keyof typeof imageMap] || musicImg
 
   return (
-    <div
-      className="group relative bg-card border border-chrome-border rounded-xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 ease-card hover:bg-card-hover animate-fade-in-up backdrop-blur-sm"
-      style={{ animationDelay: `${index * 100}ms` }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0px) scale(1)'
-      }}
+    <article
+      className="group relative w-full max-w-2xl mx-auto opacity-0 animate-gallery-fade-in cursor-pointer"
+      style={{ animationDelay: `${index * 150}ms` }}
+      onClick={handleClick}
     >
-      {/* Badge */}
-      {card.badge && (
-        <div className="absolute -top-2 -right-2 z-10">
-          <Badge variant={card.badge.toLowerCase() as 'new' | 'wip' | 'drop'}>
-            {card.badge}
-          </Badge>
+      {/* Artwork Container */}
+      <div className="relative bg-card">
+        {/* The Frame */}
+        <div className="artwork-frame overflow-hidden">
+          {/* Badge */}
+          {card.badge && (
+            <div className="absolute top-4 right-4 z-10">
+              <Badge variant={card.badge.toLowerCase() as 'new' | 'wip' | 'drop'}>
+                {card.badge}
+              </Badge>
+            </div>
+          )}
+
+          {/* Artwork Image */}
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <img
+              src={imageUrl}
+              alt={card.title}
+              className="w-full h-full object-cover transition-transform duration-700 ease-museum group-hover:scale-105"
+              loading="lazy"
+            />
+            
+            {/* Hover Overlay */}
+            <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-500" />
+            
+            {/* View Arrow */}
+            <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+              <div className="bg-background/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+                <ArrowUpRight className="h-5 w-5 text-foreground" />
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Card Image */}
-      <div className="relative mb-4 overflow-hidden rounded-lg">
-        <img
-          src={imageUrl}
-          alt={card.title}
-          className="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
-
-      {/* Card Content */}
-      <div className="space-y-3">
-        <div>
-          <h3 className="font-semibold text-card-foreground group-hover:text-apple-blue transition-colors">
+        {/* Artwork Label (Museum Placard) */}
+        <div className="mt-6 space-y-2 text-center">
+          <h2 className="font-serif text-2xl md:text-3xl font-medium text-foreground group-hover:text-foreground/80 transition-colors">
             {card.title}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">{card.subtitle}</p>
-        </div>
-
-        {/* CTA Button */}
-        <Button
-          onClick={handleClick}
-          className="w-full bg-apple-blue hover:bg-apple-blue-hover text-white shadow-sm hover:shadow-glow transition-all group-hover:animate-glow-pulse"
-          size="sm"
-        >
-          <div className="flex items-center gap-2">
-            {card.href.startsWith('mailto:') ? (
-              <Mail className="h-4 w-4" />
-            ) : (
-              <ExternalLink className="h-4 w-4" />
-            )}
-            <span>
-              {card.href.startsWith('mailto:') ? 'Contact' : 'Open Link'}
+          </h2>
+          <p className="text-sm tracking-wide text-muted-foreground font-light">
+            {card.subtitle}
+          </p>
+          <div className="pt-2">
+            <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground/60">
+              {card.category}
             </span>
           </div>
-        </Button>
+        </div>
       </div>
-    </div>
+    </article>
   )
 }

@@ -1,58 +1,41 @@
-import { Monitor, Moon, Sun } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 import { useTheme } from './ThemeProvider'
 import { Button } from '@/components/ui/button'
-import musicLogo from '@/assets/music.jpg'
 
 export function Header() {
   const { theme, setTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-chrome-border bg-chrome-header backdrop-blur-glass">
-      <div className="container flex h-16 items-center justify-between px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <img
-            src={musicLogo}
-            alt="Stino 180 Logo"
-            className="h-8 w-8 rounded-lg shadow-card border border-white/10"
-          />
-        </div>
-
-        {/* Center Title */}
-        <div className="flex-1 flex justify-center">
-          <h1 className="text-lg font-semibold tracking-tight text-foreground">
-            Stino 180 — Dashboard
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+      <div className="container flex h-20 items-center justify-between px-6 md:px-12">
+        {/* Logo / Title */}
+        <div className="flex items-center">
+          <h1 className="font-serif text-2xl md:text-3xl font-medium tracking-tight text-foreground">
+            Stino 180
           </h1>
         </div>
 
+        {/* Subtitle */}
+        <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
+          <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground font-light">
+            Gallery
+          </span>
+        </div>
+
         {/* Theme Toggle */}
-        <div className="flex items-center">
-          <div className="flex rounded-lg border border-chrome-border bg-glass-bg/50 p-1 backdrop-blur-sm">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTheme('light')}
-              className={`h-7 w-7 p-0 transition-all ${
-                theme === 'light'
-                  ? 'bg-primary text-primary-foreground shadow-glow'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Sun className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTheme('dark')}
-              className={`h-7 w-7 p-0 transition-all ${
-                theme === 'dark'
-                  ? 'bg-primary text-primary-foreground shadow-glow'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Moon className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="h-10 w-10 rounded-full hover:bg-accent"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
         </div>
       </div>
     </header>

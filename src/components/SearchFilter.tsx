@@ -1,11 +1,11 @@
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { categories } from '@/data/cards'
+
+const categories = ['All', 'Music', 'Video', 'Portfolio', 'Social', 'Projects', 'Contact']
 
 interface SearchFilterProps {
   searchQuery: string
-  onSearchChange: (query: string) => void
+  onSearchChange: (value: string) => void
   activeCategory: string
   onCategoryChange: (category: string) => void
 }
@@ -17,35 +17,33 @@ export function SearchFilter({
   onCategoryChange,
 }: SearchFilterProps) {
   return (
-    <div className="space-y-4 mb-8">
-      {/* Search Input */}
-      <div className="relative max-w-md mx-auto">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="flex flex-col items-center gap-8 mb-20">
+      {/* Search */}
+      <div className="relative w-full max-w-md">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search links..."
+          placeholder="Search the gallery..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 bg-card/50 border-chrome-border backdrop-blur-sm focus:ring-apple-blue focus:border-apple-blue transition-all"
+          className="pl-11 h-12 bg-background border-border/50 rounded-full text-sm placeholder:text-muted-foreground/60 focus-visible:ring-1 focus-visible:ring-foreground/20"
         />
       </div>
 
-      {/* Category Filters */}
+      {/* Category Pills */}
       <div className="flex flex-wrap justify-center gap-2">
         {categories.map((category) => (
-          <Button
+          <button
             key={category}
-            variant={activeCategory === category ? 'default' : 'ghost'}
-            size="sm"
             onClick={() => onCategoryChange(category)}
-            className={`transition-all ${
+            className={`px-5 py-2 text-xs tracking-[0.15em] uppercase transition-all duration-300 rounded-full border ${
               activeCategory === category
-                ? 'bg-apple-blue hover:bg-apple-blue-hover text-white shadow-glow'
-                : 'hover:bg-card-hover border border-chrome-border/50'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-transparent text-muted-foreground border-border/50 hover:border-foreground/30 hover:text-foreground'
             }`}
           >
             {category}
-          </Button>
+          </button>
         ))}
       </div>
     </div>
