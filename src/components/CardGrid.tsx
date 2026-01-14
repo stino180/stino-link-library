@@ -37,7 +37,7 @@ export function CardGrid({ cards, searchQuery, activeCategory }: CardGridProps) 
   }
 
   return (
-    <div className="h-full flex items-center gap-16 md:gap-24">
+    <div className="h-full flex items-start gap-12 md:gap-20">
       {filteredCards.map((card, index) => (
         <LinkCard key={card.id} card={card} index={index} />
       ))}
