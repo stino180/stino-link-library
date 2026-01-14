@@ -26,23 +26,37 @@ const Index = () => {
         </section>
 
         {/* Gallery Room */}
-        <section className="flex-1 relative overflow-hidden">
-          {/* Ceiling rail */}
-          <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-b from-muted/60 to-muted/20 shadow-sm" />
-          <div className="absolute top-3 left-0 right-0 h-px bg-border/40" />
+        <section className="flex-1 relative overflow-hidden gallery-room">
+          {/* Ceiling with Track Lighting */}
+          <div className="absolute top-0 left-0 right-0 z-20">
+            {/* Ceiling surface */}
+            <div className="h-8 bg-gradient-to-b from-[#f0f0f0] via-[#e8e8e8] to-[#e0e0e0] dark:from-[#1a1a1a] dark:via-[#151515] dark:to-[#101010]" />
+            
+            {/* Track rail */}
+            <div className="h-3 track-lighting flex items-center justify-center">
+              <div className="w-[95%] h-1 bg-[#1a1a1a] rounded-full" />
+            </div>
+            
+            {/* Track lights */}
+            <div className="absolute top-8 left-0 right-0 flex justify-around px-[10%]">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="track-light" />
+              ))}
+            </div>
+          </div>
           
-          {/* Gallery Wall Background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-muted/10 via-background to-muted/30" />
+          {/* Gallery Wall */}
+          <div className="absolute inset-0 top-11 bottom-[100px] gallery-wall" />
           
-          {/* Floor */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[hsl(30,20%,25%)] via-[hsl(30,15%,35%)] to-[hsl(30,10%,50%)]" />
-          <div className="absolute bottom-20 left-0 right-0 h-px bg-border/50" />
-          {/* Floor reflection */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-transparent to-white/5" />
+          {/* Floor baseboard */}
+          <div className="absolute bottom-[100px] left-0 right-0 h-3 bg-gradient-to-b from-[#d0d0d0] to-[#b0b0b0] dark:from-[#2a2a2a] dark:to-[#1a1a1a] shadow-sm" />
+          
+          {/* Wood Plank Floor */}
+          <div className="absolute bottom-0 left-0 right-0 h-[100px] gallery-floor" />
           
           {/* Horizontal Scrolling Gallery */}
-          <div className="h-full pt-0 pb-24 overflow-x-auto overflow-y-hidden scrollbar-gallery">
-            <div className="h-full px-12 min-w-max flex items-start">
+          <div className="h-full pt-[120px] pb-[130px] overflow-x-auto overflow-y-hidden scrollbar-gallery relative z-10">
+            <div className="h-full px-16 min-w-max flex items-center">
               <CardGrid
                 cards={linkCards}
                 searchQuery={searchQuery}
