@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useEffect, useCallback } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { 
   OrbitControls, 
@@ -172,26 +172,107 @@ function GalleryRoom({ cards, onCardClick }: { cards: LinkCardType[], onCardClic
   )
 }
 
-function CameraController({ cardsCount }: { cardsCount: number }) {
+function CameraController({ cardsCount, controlsRef }: { cardsCount: number, controlsRef: React.MutableRefObject<any> }) {
   const { camera } = useThree()
   const targetX = useRef(0)
+  const isScrolling = useRef(false)
+  const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   
   useFrame(() => {
-    // Smooth camera follow
-    camera.position.x += (targetX.current - camera.position.x) * 0.05
+    if (controlsRef.current) {
+      // Smooth camera follow - always active for smooth movement
+      const lerpSpeed = 0.1
+      const currentX = camera.position.x
+      const newX = currentX + (targetX.current - currentX) * lerpSpeed
+      
+      // Only update if there's a meaningful change
+      if (Math.abs(newX - currentX) > 0.001) {
+        camera.position.x = newX
+        
+        // Update OrbitControls target to follow camera for better control feel
+        const currentTarget = controlsRef.current.target
+        controlsRef.current.target.set(
+          targetX.current,
+          currentTarget.y,
+          currentTarget.z
+        )
+        controlsRef.current.update()
+      }
+    }
   })
 
-  // Handle scroll to move camera
-  const handleWheel = (e: WheelEvent) => {
+  // Handle scroll to move camera horizontally
+  const handleWheel = useCallback((e: WheelEvent) => {
+    // Let OrbitControls handle zoom when Ctrl/Cmd is held or when shift is held
+    if (e.ctrlKey || e.metaKey || e.shiftKey) {
+      return // Let OrbitControls handle zoom/pan
+    }
+    
+    // Check if this is primarily a horizontal scroll
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5) {
+      return // Let OrbitControls handle horizontal pan
+    }
+    
+    // Only handle vertical scroll for horizontal navigation
+    // Check if we're over the canvas area (not over UI elements)
+    const target = e.target as HTMLElement
+    if (target && !target.closest('canvas') && !target.closest('[class*="absolute"]')) {
+      return // Don't intercept scroll if over UI elements
+    }
+    
+    // Prevent default scroll behavior for navigation
+    e.preventDefault()
+    e.stopPropagation()
+    
+    isScrolling.current = true
     const maxX = (cardsCount - 1) * 4
-    targetX.current = Math.max(-2, Math.min(maxX + 2, targetX.current + e.deltaY * 0.01))
-  }
-
-  // Set up wheel listener
-  useMemo(() => {
-    window.addEventListener('wheel', handleWheel)
-    return () => window.removeEventListener('wheel', handleWheel)
+    const scrollSensitivity = 0.025 // Slightly increased for better responsiveness
+    targetX.current = Math.max(-2, Math.min(maxX + 2, targetX.current + e.deltaY * scrollSensitivity))
+    
+    // Clear existing timeout
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current)
+    }
+    
+    // Stop scrolling after a delay
+    scrollTimeout.current = setTimeout(() => {
+      isScrolling.current = false
+    }, 200)
   }, [cardsCount])
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault()
+      isScrolling.current = true
+      const maxX = (cardsCount - 1) * 4
+      const step = 2
+      const direction = e.key === 'ArrowLeft' ? -1 : 1
+      targetX.current = Math.max(-2, Math.min(maxX + 2, targetX.current + direction * step))
+      
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current)
+      }
+      
+      scrollTimeout.current = setTimeout(() => {
+        isScrolling.current = false
+      }, 150)
+    }
+  }, [cardsCount])
+
+  // Set up event listeners
+  useEffect(() => {
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('keydown', handleKeyDown)
+    
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('keydown', handleKeyDown)
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current)
+      }
+    }
+  }, [handleWheel, handleKeyDown])
 
   return null
 }
@@ -202,6 +283,8 @@ interface GallerySceneProps {
 }
 
 export function GalleryScene({ cards, onCardClick }: GallerySceneProps) {
+  const controlsRef = useRef<any>(null)
+  
   return (
     <div className="w-full h-full">
       <Canvas
@@ -224,25 +307,52 @@ export function GalleryScene({ cards, onCardClick }: GallerySceneProps) {
 
         <GalleryRoom cards={cards} onCardClick={onCardClick} />
         
-        <CameraController cardsCount={cards.length} />
+        <CameraController cardsCount={cards.length} controlsRef={controlsRef} />
         
         <OrbitControls 
+          ref={controlsRef}
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI / 2}
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2.2}
           minDistance={3}
-          maxDistance={10}
+          maxDistance={12}
           target={[0, 0.5, 0]}
+          // Improved sensitivity and damping for better responsiveness
+          rotateSpeed={0.8}
+          zoomSpeed={0.8}
+          panSpeed={0.8}
+          dampingFactor={0.05}
+          enableDamping={true}
+          // Allow more freedom in rotation
+          minAzimuthAngle={-Infinity}
+          maxAzimuthAngle={Infinity}
         />
         
         <Environment preset="studio" />
       </Canvas>
       
       {/* Instructions overlay */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 text-sm bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
-        Scroll to navigate • Drag to look around • Click artwork to visit
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 text-sm bg-black/40 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
+        <div className="flex items-center gap-4 flex-wrap justify-center">
+          <span className="flex items-center gap-1.5">
+            <kbd className="px-2 py-1 text-xs bg-white/10 rounded">Scroll</kbd>
+            <span>to move</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <kbd className="px-2 py-1 text-xs bg-white/10 rounded">Drag</kbd>
+            <span>to look</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <kbd className="px-2 py-1 text-xs bg-white/10 rounded">← →</kbd>
+            <span>keys to navigate</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <kbd className="px-2 py-1 text-xs bg-white/10 rounded">Click</kbd>
+            <span>artwork to visit</span>
+          </span>
+        </div>
       </div>
     </div>
   )
