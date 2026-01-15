@@ -115,6 +115,10 @@ export default {
           "Consolas",
           "monospace"
         ],
+        cursive: [
+          "Allura",
+          "cursive"
+        ],
       },
       keyframes: {
         "accordion-down": {

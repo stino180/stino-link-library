@@ -30,16 +30,16 @@ export function SearchFilter({
         />
       </div>
 
-      {/* Category Pills */}
-      <div className="flex flex-wrap justify-center gap-2">
+      {/* Category Pills - Enhanced visibility */}
+      <div className="flex flex-wrap justify-center gap-3">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => onCategoryChange(category)}
-            className={`px-5 py-2 text-xs tracking-[0.15em] uppercase transition-all duration-300 rounded-full border ${
+            className={`px-6 py-2.5 text-sm font-medium tracking-[0.1em] uppercase transition-all duration-300 rounded-full border-2 backdrop-blur-md shadow-lg ${
               activeCategory === category
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-transparent text-muted-foreground border-border/50 hover:border-foreground/30 hover:text-foreground'
+                ? 'bg-white/95 text-black border-white shadow-xl scale-105'
+                : 'bg-black/60 text-white/90 border-white/40 hover:bg-black/80 hover:border-white/60 hover:text-white hover:scale-105'
             }`}
           >
             {category}

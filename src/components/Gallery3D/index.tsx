@@ -60,7 +60,11 @@ export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps
 
   return (
     <Suspense fallback={<LoadingScreen />}>
-      <GalleryScene cards={filteredCards} onCardClick={handleCardClick} />
+      <GalleryScene 
+        cards={filteredCards} 
+        onCardClick={handleCardClick}
+        activeCategory={activeCategory}
+      />
     </Suspense>
   )
 }

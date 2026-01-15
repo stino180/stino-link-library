@@ -10,8 +10,8 @@ export function Header() {
       <div className="container flex h-20 items-center justify-between px-6 md:px-12">
         {/* Logo / Title */}
         <div className="flex items-center">
-          <h1 className="font-serif text-2xl md:text-3xl font-medium tracking-tight text-foreground">
-            Stino 180
+          <h1 className="font-serif text-2xl md:text-3xl font-normal tracking-tight text-foreground">
+            Justin's portfolio
           </h1>
         </div>
 
