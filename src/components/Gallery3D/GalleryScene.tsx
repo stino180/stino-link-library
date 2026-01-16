@@ -1057,7 +1057,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
               e.stopPropagation()
               handleResetCamera(e)
             }}
-            className="pointer-events-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:text-white hover:border-white/60 active:scale-90 transition-all duration-200 flex items-center justify-center touch-manipulation select-none cursor-pointer shadow-2xl"
+            className="pointer-events-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 backdrop-blur-md border-2 border-white/40 text-white hover:bg-black/90 hover:text-white hover:border-white/60 active:scale-90 transition-[transform,background-color,border-color] duration-200 flex items-center justify-center touch-manipulation select-none cursor-pointer shadow-2xl will-change-transform"
             aria-label="Reset camera position"
             title="Reset camera"
             type="button"
@@ -1206,7 +1206,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
             <div className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30" />
             {/* Joystick handle */}
             <div
-              className={`absolute ${isMobile ? 'w-8 h-8' : 'w-10 h-10 md:w-12 md:h-12'} rounded-full bg-white/40 backdrop-blur-sm border-2 border-white/60 transition-transform duration-150 ease-out`}
+              className={`absolute ${isMobile ? 'w-8 h-8' : 'w-10 h-10 md:w-12 md:h-12'} rounded-full bg-white/40 backdrop-blur-sm border-2 border-white/60 transition-transform duration-150 ease-out will-change-transform`}
               style={{
                 transform: `translate(calc(-50% + ${joystickPosition.x}px), calc(-50% + ${joystickPosition.y}px))`,
                 left: '50%',
@@ -1230,7 +1230,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
                   controls.update()
                 }
               }}
-              className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center touch-manipulation`}
+              className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-[transform,background-color] duration-150 flex items-center justify-center touch-manipulation will-change-transform`}
               aria-label="Zoom in"
             >
               <ChevronUp className={isMobile ? 'w-5 h-5' : 'w-6 h-6'} />
@@ -1264,7 +1264,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
                   e.stopPropagation()
                   stopMoving()
                 }}
-                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center touch-manipulation`}
+                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-[transform,background-color] duration-150 flex items-center justify-center touch-manipulation will-change-transform`}
                 aria-label="Move left"
               >
                 <ChevronLeft className={isMobile ? 'w-5 h-5' : 'w-6 h-6'} />
@@ -1278,7 +1278,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
                     controls.update()
                   }
                 }}
-                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center touch-manipulation`}
+                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-[transform,background-color] duration-150 flex items-center justify-center touch-manipulation will-change-transform`}
                 aria-label="Zoom out"
               >
                 <ChevronDown className={isMobile ? 'w-5 h-5' : 'w-6 h-6'} />
@@ -1310,7 +1310,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
                   e.stopPropagation()
                   stopMoving()
                 }}
-                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center touch-manipulation`}
+                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-[transform,background-color] duration-150 flex items-center justify-center touch-manipulation will-change-transform`}
                 aria-label="Move right"
               >
                 <ChevronRight className={isMobile ? 'w-5 h-5' : 'w-6 h-6'} />
@@ -1324,7 +1324,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
       <div className={`fixed ${isMobile ? 'bottom-3 right-3' : 'bottom-6 right-6 md:right-8'} z-[9999] pointer-events-none`}>
         <button
           onClick={() => setControlsVisible(!controlsVisible)}
-          className={`pointer-events-auto ${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center shadow-lg touch-manipulation`}
+          className={`pointer-events-auto ${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-[transform,background-color] duration-150 flex items-center justify-center shadow-lg touch-manipulation will-change-transform`}
           aria-label={controlsVisible ? "Hide controls" : "Show controls"}
           title={controlsVisible ? "Hide controls" : "Show controls"}
         >

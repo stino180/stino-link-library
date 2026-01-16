@@ -29,6 +29,7 @@ export function Header() {
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="h-10 w-10 rounded-full hover:bg-accent"
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? (
               <Sun className="h-5 w-5" />

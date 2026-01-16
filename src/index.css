@@ -135,17 +135,20 @@
   .museum-title {
     @apply text-4xl md:text-5xl lg:text-6xl font-light tracking-tight;
     font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    font-display: swap;
   }
 
   .museum-subtitle {
     @apply text-lg md:text-xl font-light tracking-wide text-muted-foreground;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    font-display: swap;
   }
 
   .museum-body {
     @apply text-base font-light leading-relaxed;
     letter-spacing: 0.02em;
+    font-display: swap;
   }
 
   .gallery-card {
