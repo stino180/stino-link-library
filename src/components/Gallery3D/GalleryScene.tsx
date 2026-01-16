@@ -202,6 +202,21 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
 function BioPlaque({ roomDepth }: { roomDepth: number }) {
   const bioText = `"I create music, build digital experiences, and develop platforms that bring ideas to life. Here you'll find my music, social channels, and web projects for both personal brands and clients."`
   const authorText = `-Justin`
+  const emailText = `jstrongmgmt@gmail.com`
+  
+  // Handle email click
+  const handleEmailClick = useCallback(() => {
+    window.location.href = 'mailto:jstrongmgmt@gmail.com'
+  }, [])
+  
+  // Cursor change on hover
+  const handlePointerOver = useCallback(() => {
+    document.body.style.cursor = 'pointer'
+  }, [])
+
+  const handlePointerOut = useCallback(() => {
+    document.body.style.cursor = 'auto'
+  }, [])
   
   return (
     <group position={[-4, 0.5, -roomDepth / 2 + 0.5]}>
@@ -260,20 +275,38 @@ function BioPlaque({ roomDepth }: { roomDepth: number }) {
         {authorText}
       </Text>
       
-      {/* Email - below signature */}
-      <Text
-        position={[1.4, -1.35, 0.02]}
-        fontSize={0.12}
-        color="#ffffff"
-        anchorX="right"
-        anchorY="middle"
-        outlineWidth={0.015}
-        outlineColor="#000000"
-        renderOrder={3}
-        letterSpacing={0.01}
+      {/* Email - larger, centered, and clickable - moved down further from signature */}
+      <group 
+        position={[0, -1.75, 0.02]}
+        onClick={handleEmailClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
       >
-        jstrongmgmt@gmail.com
-      </Text>
+        {/* Clickable area behind email text */}
+        <mesh position={[0, 0, -0.001]}>
+          <planeGeometry args={[3.2, 0.35]} />
+          <meshStandardMaterial 
+            color="#ffffff" 
+            opacity={0} 
+            transparent
+          />
+        </mesh>
+        
+        {/* Email text - much larger and centered */}
+        <Text
+          position={[0, 0, 0.001]}
+          fontSize={0.20}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.03}
+          outlineColor="#000000"
+          renderOrder={4}
+          letterSpacing={0.02}
+        >
+          {emailText}
+        </Text>
+      </group>
     </group>
   )
 }
@@ -400,9 +433,22 @@ function CameraController({
   useEffect(() => {
     const moveCamera = (direction: number) => {
       const maxX = (cardsCount - 1) * 4
-      const step = 1.0 // Further reduced for smoother, less sensitive button movement
-      targetX.current = Math.max(-2, Math.min(maxX + 2, targetX.current + direction * step))
+      const step = 1.5 // Increased for more responsive button movement
+      const newTargetX = targetX.current + direction * step
+      // Ensure we can move in both directions equally
+      targetX.current = Math.max(-2, Math.min(maxX + 2, newTargetX))
+      
+      // Force immediate update by triggering scrolling state
       isScrolling.current = true
+      
+      // Also directly update camera position slightly for immediate feedback
+      if (controlsRef.current && controlsRef.current.target) {
+        const controls = controlsRef.current
+        const immediateStep = step * 0.3 // Immediate visual feedback
+        camera.position.x += direction * immediateStep
+        controls.target.x += direction * immediateStep
+        controls.update()
+      }
       
       if (scrollTimeout.current) {
         clearTimeout(scrollTimeout.current)
@@ -533,6 +579,12 @@ function CameraController({
   
   const isUserInteracting = useRef(false)
   const frameSkip = useRef(0)
+  const lastCameraX = useRef(camera.position.x)
+  
+  // Initialize lastCameraX on mount
+  useEffect(() => {
+    lastCameraX.current = camera.position.x
+  }, [camera])
   
   // Optimized camera movement - only update when needed, with frame skipping for performance
   useFrame(() => {
@@ -550,6 +602,9 @@ function CameraController({
       if (joystickRotationRef && joystickRotationRef.current) {
         const { azimuth, polar } = joystickRotationRef.current
         if (Math.abs(azimuth) > 0.001 || Math.abs(polar) > 0.001) {
+          // Store current target X before rotation
+          const desiredX = targetX.current
+          
           // Get current spherical coordinates
           const spherical = new THREE.Spherical()
           spherical.setFromVector3(
@@ -569,19 +624,54 @@ function CameraController({
           newPosition.add(controls.target)
           camera.position.copy(newPosition)
           
+          // Compensate to maintain horizontal position - adjust both camera and target
+          const currentX = camera.position.x
+          const deltaX = desiredX - currentX
+          if (Math.abs(deltaX) > 0.001) {
+            camera.position.x = desiredX
+            controls.target.x += deltaX
+          }
+          
           controls.update()
           
           // Decay joystick rotation - smoother decay
           joystickRotationRef.current.azimuth *= 0.94
           joystickRotationRef.current.polar *= 0.94
+          
+          lastCameraX.current = camera.position.x
         }
       }
       
+      const currentX = camera.position.x
+      const isRotating = isUserInteracting.current && !isScrolling.current
+      
+      // If user is rotating, continuously compensate to prevent horizontal drift
+      if (isRotating) {
+        // OrbitControls is rotating the camera, which changes its X position
+        // Compensate by adjusting both camera and target to maintain targetX
+        const desiredX = targetX.current
+        const deltaX = desiredX - currentX
+        
+        // Only compensate if there's a meaningful difference
+        if (Math.abs(deltaX) > 0.005) {
+          // Adjust camera X to desired position
+          camera.position.x = desiredX
+          // Adjust target X by the same amount to maintain rotation
+          controls.target.x += deltaX
+          controls.update()
+          lastCameraX.current = desiredX
+        } else {
+          lastCameraX.current = currentX
+        }
+        // Skip horizontal movement lerp while rotating
+        return
+      }
+      
+      // Normal horizontal movement (when not rotating)
       const isActive = (controls.enabled !== false) && (isScrolling.current || !isUserInteracting.current)
       
       if (isActive) {
-        const lerpSpeed = 0.04 // Reduced for smoother movement
-        const currentX = camera.position.x
+        const lerpSpeed = isScrolling.current ? 0.08 : 0.04 // Faster lerp when actively scrolling/button pressing
         const delta = targetX.current - currentX
         
         // Only update if there's a meaningful change (increased threshold for performance)
@@ -597,7 +687,12 @@ function CameraController({
             // Only call update once per frame
             controls.update()
           }
+          
+          lastCameraX.current = newX
         }
+      } else {
+        // When not active, track the X position
+        lastCameraX.current = currentX
       }
     } catch (error) {
       // Silently handle errors
@@ -772,17 +867,25 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
     }
   }, [activeCategory])
   
-  const handleMoveLeft = () => {
+  const handleMoveLeft = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     if (moveCameraRef.current) {
       moveCameraRef.current(-1)
     }
-  }
+  }, [])
   
-  const handleMoveRight = () => {
+  const handleMoveRight = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     if (moveCameraRef.current) {
       moveCameraRef.current(1)
     }
-  }
+  }, [])
   
   const handleResetCamera = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
@@ -817,20 +920,29 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
   }, [resetTrigger])
   
   const startMoving = (direction: number) => {
-    if (isMovingRef.current) return
+    if (isMovingRef.current && moveIntervalRef.current) {
+      // Already moving, just update direction if needed
+      return
+    }
     isMovingRef.current = true
     
-    // Move immediately
+    // Move immediately - more aggressive for better responsiveness
     if (moveCameraRef.current) {
       moveCameraRef.current(direction)
+      // Double tap for immediate feedback
+      setTimeout(() => {
+        if (moveCameraRef.current) {
+          moveCameraRef.current(direction * 0.5)
+        }
+      }, 50)
     }
     
-    // Then continue moving while held
+    // Then continue moving while held - slightly faster interval
     moveIntervalRef.current = setInterval(() => {
       if (moveCameraRef.current) {
         moveCameraRef.current(direction)
       }
-    }, 150) // Move every 150ms while held for smoother, less aggressive continuous movement
+    }, 120) // Reduced interval for more responsive continuous movement
   }
   
   const stopMoving = () => {
@@ -1136,15 +1248,29 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
             {/* Left/Center/Right row */}
             <div className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
               <button
-                onClick={handleMoveLeft}
-                onMouseDown={() => startMoving(-1)}
-                onMouseUp={stopMoving}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleMoveLeft(e)
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  startMoving(-1)
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  stopMoving()
+                }}
                 onTouchStart={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   startMoving(-1)
                 }}
                 onTouchEnd={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   stopMoving()
                 }}
                 className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center touch-manipulation`}
@@ -1168,15 +1294,29 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
               </button>
               
               <button
-                onClick={handleMoveRight}
-                onMouseDown={() => startMoving(1)}
-                onMouseUp={stopMoving}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleMoveRight(e)
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  startMoving(1)
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  stopMoving()
+                }}
                 onTouchStart={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   startMoving(1)
                 }}
                 onTouchEnd={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   stopMoving()
                 }}
                 className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-black/60 backdrop-blur-md border-2 border-white/30 text-white hover:bg-black/80 active:scale-90 transition-all flex items-center justify-center touch-manipulation`}

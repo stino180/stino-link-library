@@ -20,15 +20,18 @@ function LoadingScreen() {
 }
 
 export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps) {
-  // Filter cards
+  // Filter cards - Contact category is special, it shows all cards but moves camera to bio plaque
   const filteredCards = cards.filter((card) => {
     const matchesSearch =
       searchQuery === '' ||
       card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       card.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
     
+    // Contact category doesn't filter - it just moves camera to bio plaque
     const matchesCategory =
-      activeCategory === 'All' || card.category === activeCategory
+      activeCategory === 'All' || 
+      activeCategory === 'Contact' || 
+      card.category === activeCategory
 
     return matchesSearch && matchesCategory
   })
@@ -43,7 +46,8 @@ export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps
     }
   }
 
-  if (filteredCards.length === 0) {
+  // Don't show "No works found" for Contact category - it's special
+  if (filteredCards.length === 0 && activeCategory !== 'Contact') {
     return (
       <div className="w-full h-full flex items-center justify-center bg-background">
         <div className="text-center">
