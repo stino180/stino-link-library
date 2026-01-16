@@ -127,7 +127,7 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
           roughness={0.8}
           metalness={0}
           // Make artwork more self-contained, less affected by spotlights
-          emissive={texture}
+          emissive="#ffffff"
           emissiveIntensity={0.3}
           emissiveMap={texture}
         />
@@ -953,8 +953,8 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
     isMovingRef.current = false
   }
   
-  // Joystick handler
-  const handleJoystickMove = useCallback((e: React.MouseEvent | React.TouchEvent | MouseEvent | Touch) => {
+  // Joystick handler - simplified to handle the actual event types we receive
+  const handleJoystickMove = useCallback((e: React.MouseEvent | React.TouchEvent | MouseEvent) => {
     if (!joystickRef.current) return
     
     const rect = joystickRef.current.getBoundingClientRect()
@@ -964,23 +964,18 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
     let clientX: number
     let clientY: number
     
-    if ('nativeEvent' in e) {
-      // React event
-      if ('touches' in e && e.touches.length > 0) {
-        clientX = e.touches[0].clientX
-        clientY = e.touches[0].clientY
-      } else {
-        clientX = e.clientX
-        clientY = e.clientY
-      }
+    // Handle React TouchEvent
+    if ('touches' in e && e.touches?.length > 0) {
+      clientX = e.touches[0].clientX
+      clientY = e.touches[0].clientY
     } else if ('clientX' in e) {
-      // Native MouseEvent
+      // MouseEvent (React or native)
       clientX = e.clientX
       clientY = e.clientY
     } else {
-      // Touch object
-      clientX = e.clientX
-      clientY = e.clientY
+      // Fallback
+      clientX = centerX
+      clientY = centerY
     }
     
     const deltaX = clientX - centerX
@@ -1014,12 +1009,8 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
     
     const handleGlobalMove = (e: MouseEvent | TouchEvent) => {
       if (joystickActive && joystickRef.current) {
-        const touch = 'touches' in e && e.touches.length > 0 ? e.touches[0] : null
-        const mouse = 'clientX' in e ? e : null
-        const event = touch || mouse
-        if (event) {
-          handleJoystickMove(event)
-        }
+        // Pass the native event directly - handleJoystickMove can handle both types
+        handleJoystickMove(e as unknown as React.MouseEvent | React.TouchEvent | MouseEvent)
       }
     }
     
@@ -1186,12 +1177,12 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
             onTouchStart={(e) => {
               e.preventDefault()
               setJoystickActive(true)
-              handleJoystickMove(e.touches[0])
+              handleJoystickMove(e)
             }}
             onTouchMove={(e) => {
               if (joystickActive && e.touches[0]) {
                 e.preventDefault()
-                handleJoystickMove(e.touches[0])
+                handleJoystickMove(e)
               }
             }}
             onTouchEnd={(e) => {
