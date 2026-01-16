@@ -1,8 +1,6 @@
-import { Suspense, useState, lazy } from 'react'
+import { Suspense, useState } from 'react'
+import { GalleryScene } from './GalleryScene'
 import { LinkCard as LinkCardType } from '@/data/cards'
-
-// Lazy load GalleryScene to further isolate Three.js code into its own chunk
-const GalleryScene = lazy(() => import('./GalleryScene').then(module => ({ default: module.GalleryScene })))
 
 interface Gallery3DProps {
   cards: LinkCardType[]
