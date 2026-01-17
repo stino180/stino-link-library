@@ -836,6 +836,20 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
   const [resetTrigger, setResetTrigger] = useState(0)
   const [controlsVisible, setControlsVisible] = useState(true)
   const moveToBioPlaqueRef = useRef<(() => void) | null>(null)
+  const [isWebGLSupported, setIsWebGLSupported] = useState(true)
+  
+  // Check WebGL support on mount
+  useEffect(() => {
+    try {
+      const canvas = document.createElement('canvas')
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+      if (!gl) {
+        setIsWebGLSupported(false)
+      }
+    } catch (e) {
+      setIsWebGLSupported(false)
+    }
+  }, [])
   
   // Detect mobile device
   const [isMobile, setIsMobile] = useState(false)
@@ -1046,6 +1060,18 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
     }
   }, [])
   
+  // Show fallback if WebGL is not supported
+  if (!isWebGLSupported) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-background" style={{ minHeight: '100vh' }}>
+        <div className="text-center">
+          <p className="font-serif text-xl text-muted-foreground">3D Gallery requires WebGL</p>
+          <p className="mt-2 text-sm text-muted-foreground/60">Please enable WebGL or try a different browser</p>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="w-full h-full relative" style={{ minHeight: '100vh' }}>
       {/* Reset Camera Button - Only show when controls visible */}
@@ -1076,15 +1102,28 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
         gl={{ 
           antialias: !isMobile, 
           toneMapping: THREE.ACESFilmicToneMapping,
-          powerPreference: "high-performance",
+          powerPreference: "default",
           stencil: false,
           depth: true,
-          alpha: false,
-          preserveDrawingBuffer: false
+          alpha: true,
+          preserveDrawingBuffer: true,
+          failIfMajorPerformanceCaveat: false
         }}
-        dpr={isMobile ? Math.min(window.devicePixelRatio, 1) : Math.min(window.devicePixelRatio, 1.2)}
+        dpr={[1, isMobile ? 1 : 1.5]}
         performance={{ min: isMobile ? 0.3 : 0.5 }}
         frameloop="always"
+        fallback={
+          <div className="w-full h-full flex items-center justify-center bg-background">
+            <div className="text-center">
+              <p className="font-serif text-xl text-muted-foreground">WebGL not supported</p>
+              <p className="mt-2 text-sm text-muted-foreground/60">Please try a different browser</p>
+            </div>
+          </div>
+        }
+        onCreated={(state) => {
+          // Ensure WebGL context is properly initialized
+          state.gl.setClearColor('#0a0a0a', 1)
+        }}
       >
         <color attach="background" args={['#0a0a0a']} />
         
