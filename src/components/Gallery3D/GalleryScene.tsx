@@ -837,7 +837,8 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
   const [controlsVisible, setControlsVisible] = useState(true)
   const moveToBioPlaqueRef = useRef<(() => void) | null>(null)
   const [isWebGLSupported, setIsWebGLSupported] = useState(true)
-  
+  const [isWebGLContextLost, setIsWebGLContextLost] = useState(false)
+
   // Check WebGL support on mount
   useEffect(() => {
     try {
@@ -846,11 +847,11 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
       if (!gl) {
         setIsWebGLSupported(false)
       }
-    } catch (e) {
+    } catch {
       setIsWebGLSupported(false)
     }
   }, [])
-  
+
   // Detect mobile device
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
@@ -1071,7 +1072,20 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
       </div>
     )
   }
-  
+
+  // Some browsers/devices can lose the WebGL context (shows as a blank screen).
+  // When that happens, show a clear recovery message instead of rendering nothing.
+  if (isWebGLContextLost) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-background" style={{ minHeight: '100vh' }}>
+        <div className="text-center">
+          <p className="font-serif text-xl text-muted-foreground">3D view paused</p>
+          <p className="mt-2 text-sm text-muted-foreground/60">Your browser lost the WebGL context. Please refresh the page.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full h-full relative" style={{ minHeight: '100vh' }}>
       {/* Reset Camera Button - Only show when controls visible */}
@@ -1092,24 +1106,25 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
           </button>
         </div>
       )}
-      
+
       <Canvas
         shadows={!isMobile}
-        camera={{ 
-          position: [0, 1.2, 5.5], 
-          fov: isMobile ? 60 : 50 
+        camera={{
+          position: [0, 1.2, 5.5],
+          fov: isMobile ? 60 : 50,
         }}
-        gl={{ 
-          antialias: !isMobile, 
+        gl={{
+          antialias: !isMobile,
           toneMapping: THREE.ACESFilmicToneMapping,
-          powerPreference: "default",
+          // More stable defaults across browsers (some combinations here can lead to blank canvases)
+          powerPreference: 'high-performance',
           stencil: false,
           depth: true,
-          alpha: true,
-          preserveDrawingBuffer: true,
-          failIfMajorPerformanceCaveat: false
+          alpha: false,
+          preserveDrawingBuffer: false,
+          failIfMajorPerformanceCaveat: false,
         }}
-        dpr={[1, isMobile ? 1 : 1.5]}
+        dpr={isMobile ? 1 : [1, 1.5]}
         performance={{ min: isMobile ? 0.3 : 0.5 }}
         frameloop="always"
         fallback={
@@ -1121,15 +1136,27 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
           </div>
         }
         onCreated={(state) => {
-          // Ensure WebGL context is properly initialized
-          state.gl.setClearColor('#0a0a0a', 1)
+          const canvas = state.gl.domElement
+
+          const handleLost = (e: Event) => {
+            // Prevent default so the browser may attempt to restore the context
+            e.preventDefault?.()
+            setIsWebGLContextLost(true)
+          }
+
+          const handleRestored = () => {
+            setIsWebGLContextLost(false)
+          }
+
+          canvas.addEventListener('webglcontextlost', handleLost as EventListener)
+          canvas.addEventListener('webglcontextrestored', handleRestored as EventListener)
         }}
       >
         <color attach="background" args={['#0a0a0a']} />
-        
+
         {/* Ambient light for overall illumination - provides base lighting for artwork */}
         <ambientLight intensity={0.25} />
-        
+
         {/* Main gallery lighting - gentle, doesn't whitewash */}
         <directionalLight 
           position={[5, 10, 5]} 
