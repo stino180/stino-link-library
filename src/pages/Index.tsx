@@ -5,7 +5,24 @@ import { linkCards } from '@/data/cards'
 
 // Lazy load Gallery3D to reduce initial bundle size
 // This ensures Three.js and related libraries only load when the gallery is rendered
-const Gallery3D = lazy(() => import('@/components/Gallery3D').then(module => ({ default: module.Gallery3D })))
+const Gallery3D = lazy(() => 
+  import('../components/Gallery3D')
+    .then(module => ({ default: module.Gallery3D }))
+    .catch(error => {
+      console.error('Failed to load Gallery3D:', error)
+      // Return a fallback component on error
+      return {
+        default: () => (
+          <div className="w-full h-full flex items-center justify-center bg-background">
+            <div className="text-center">
+              <p className="font-serif text-xl text-muted-foreground">Failed to load gallery</p>
+              <p className="mt-2 text-sm text-muted-foreground/60">Please refresh the page</p>
+            </div>
+          </div>
+        )
+      }
+    })
+)
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('')
