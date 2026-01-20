@@ -19,38 +19,9 @@ export default defineConfig(({ mode }) => ({
     sourcemap: mode === "production",
     minify: 'esbuild',
     cssMinify: true,
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Split GalleryScene into its own chunk for better code splitting (check first)
-          if (id.includes('GalleryScene')) {
-            return 'gallery-scene';
-          }
-          
-          // Split vendor code
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'react-vendor';
-            }
-            // Split Three.js and related 3D libraries - isolate heavy 3D code
-            if (id.includes('three') || id.includes('@react-three')) {
-              return 'three-vendor';
-            }
-            // Split Radix UI components (large library)
-            if (id.includes('@radix-ui')) {
-              return 'radix-vendor';
-            }
-            // Split other heavy dependencies
-            if (id.includes('@tanstack/react-query') || id.includes('lucide-react')) {
-              return 'utils-vendor';
-            }
-            // Other vendor code
-            return 'vendor';
-          }
-        },
-      },
-    },
-    target: 'esnext',
+    // More compatible target for a wider range of browsers.
+    // ("esnext" can be fragile on older Safari/WebViews and can manifest as a blank screen.)
+    target: 'es2019',
     cssCodeSplit: true,
     // Optimize chunk size reporting
     reportCompressedSize: true,
