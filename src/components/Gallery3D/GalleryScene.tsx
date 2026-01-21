@@ -25,7 +25,7 @@ import twitterImg from '@/assets/twitter.jpg'
 import mozzeImg from '@/assets/mozze.png'
 import viziImg from '@/assets/vizi_test.png'
 import stackflowImg from '@/assets/dca.png'
-import stinoImg from '@/assets/stino logo.png'
+import stinoImg from '@/assets/stino-logo.png'
 
 const imageMap: Record<string, string> = {
   music: musicImg,
