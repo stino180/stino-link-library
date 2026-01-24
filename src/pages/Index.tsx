@@ -1,29 +1,9 @@
-import { useState, lazy, Suspense, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Header } from '@/components/Header'
 import { SearchFilter } from '@/components/SearchFilter'
 import { linkCards } from '@/data/cards'
 import { useSEO, getCategorySEO, generateGalleryJsonLd } from '@/hooks/useSEO'
-
-// Lazy load Gallery3D to reduce initial bundle size
-// This ensures Three.js and related libraries only load when the gallery is rendered
-const Gallery3D = lazy(() => 
-  import('../components/Gallery3D')
-    .then(module => ({ default: module.Gallery3D }))
-    .catch(error => {
-      console.error('Failed to load Gallery3D:', error)
-      // Return a fallback component on error
-      return {
-        default: () => (
-          <div className="w-full h-full flex items-center justify-center bg-background">
-            <div className="text-center">
-              <p className="font-serif text-xl text-muted-foreground">Failed to load gallery</p>
-              <p className="mt-2 text-sm text-muted-foreground/60">Please refresh the page</p>
-            </div>
-          </div>
-        )
-      }
-    })
-)
+import { Gallery3D } from '@/components/Gallery3D'
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -66,22 +46,13 @@ const Index = () => {
         />
       </div>
 
-      {/* 3D Gallery - Full screen */}
+      {/* 3D Gallery - Full screen - handles its own lazy loading */}
       <main className="flex-1 relative">
-        <Suspense fallback={
-          <div className="w-full h-full flex items-center justify-center bg-background">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="font-serif text-lg text-muted-foreground">Loading gallery...</p>
-            </div>
-          </div>
-        }>
-          <Gallery3D
-            cards={linkCards}
-            searchQuery={searchQuery}
-            activeCategory={activeCategory}
-          />
-        </Suspense>
+        <Gallery3D
+          cards={linkCards}
+          searchQuery={searchQuery}
+          activeCategory={activeCategory}
+        />
       </main>
     </div>
   )
