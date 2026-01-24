@@ -55,12 +55,20 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
   const texture = useTexture(imageUrl)
   const lastClickTime = useRef(0)
   
-  // Configure texture for performance - optimized
-  texture.colorSpace = THREE.SRGBColorSpace
-  texture.generateMipmaps = true
-  texture.minFilter = THREE.LinearMipmapLinearFilter
-  texture.magFilter = THREE.LinearFilter
-  texture.anisotropy = 2 // Further reduced for better performance
+  // Configure texture for performance - aggressive optimization
+  useMemo(() => {
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.generateMipmaps = false // Disable mipmaps for faster loading
+    texture.minFilter = THREE.LinearFilter
+    texture.magFilter = THREE.LinearFilter
+    texture.anisotropy = 1 // Minimum for best performance
+    // Resize texture if too large
+    if (texture.image && texture.image.width > 512) {
+      texture.image.width = 512
+      texture.image.height = 512
+      texture.needsUpdate = true
+    }
+  }, [texture])
   
   const frameWidth = 2
   const frameHeight = 2.5
@@ -311,33 +319,38 @@ function BioPlaque({ roomDepth }: { roomDepth: number }) {
   )
 }
 
-function GalleryRoom({ cards, onCardClick }: { cards: LinkCardType[], onCardClick: (card: LinkCardType) => void }) {
+function GalleryRoom({ cards, onCardClick, isMobile }: { cards: LinkCardType[], onCardClick: (card: LinkCardType) => void, isMobile: boolean }) {
   const roomWidth = cards.length * 4 + 10
   const roomHeight = 6
   const roomDepth = 8
 
   return (
     <group>
-      {/* Floor with reflection */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[roomWidth / 2 - 5, -2, 0]} receiveShadow>
+      {/* Floor - simplified on mobile, reflective on desktop */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[roomWidth / 2 - 5, -2, 0]} receiveShadow={!isMobile}>
         <planeGeometry args={[roomWidth + 20, roomDepth * 2]} />
-        <MeshReflectorMaterial
-          blur={[50, 20]}
-          resolution={128}
-          mixBlur={0.4}
-          mixStrength={0.25}
-          roughness={0.8}
-          depthScale={0.8}
-          minDepthThreshold={0.4}
-          maxDepthThreshold={1.4}
-          color="#8b7355"
-          metalness={0.1}
-          mirror={0.1}
-        />
+        {isMobile ? (
+          // Simple floor on mobile - no expensive reflection
+          <meshStandardMaterial color="#8b7355" roughness={0.9} metalness={0} />
+        ) : (
+          <MeshReflectorMaterial
+            blur={[50, 20]}
+            resolution={128}
+            mixBlur={0.4}
+            mixStrength={0.25}
+            roughness={0.8}
+            depthScale={0.8}
+            minDepthThreshold={0.4}
+            maxDepthThreshold={1.4}
+            color="#8b7355"
+            metalness={0.1}
+            mirror={0.1}
+          />
+        )}
       </mesh>
       
       {/* Back wall - darker for more contrast */}
-      <mesh position={[roomWidth / 2 - 5, roomHeight / 2 - 2, -roomDepth / 2]} receiveShadow>
+      <mesh position={[roomWidth / 2 - 5, roomHeight / 2 - 2, -roomDepth / 2]} receiveShadow={!isMobile}>
         <planeGeometry args={[roomWidth + 20, roomHeight + 4]} />
         <meshStandardMaterial color="#2a2a2a" roughness={0.95} />
       </mesh>
@@ -348,18 +361,20 @@ function GalleryRoom({ cards, onCardClick }: { cards: LinkCardType[], onCardClic
         <meshStandardMaterial color="#1f1f1f" roughness={0.9} />
       </mesh>
 
-      {/* Track lighting rail */}
-      <mesh position={[roomWidth / 2 - 5, roomHeight - 2.1, -1]} castShadow>
-        <boxGeometry args={[roomWidth + 10, 0.08, 0.08]} />
-        <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
-      </mesh>
+      {/* Track lighting rail - skip on mobile */}
+      {!isMobile && (
+        <mesh position={[roomWidth / 2 - 5, roomHeight - 2.1, -1]}>
+          <boxGeometry args={[roomWidth + 10, 0.08, 0.08]} />
+          <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
+        </mesh>
+      )}
 
-      {/* Spotlight for bio plaque */}
+      {/* Spotlight for bio plaque - reduced intensity on mobile */}
       <SpotLight
         position={[-4, roomHeight - 2.2, 1]}
         angle={0.4}
         penumbra={0.7}
-        intensity={25}
+        intensity={isMobile ? 15 : 25}
         distance={8}
         color="#fff4e0"
         castShadow={false}
@@ -369,22 +384,23 @@ function GalleryRoom({ cards, onCardClick }: { cards: LinkCardType[], onCardClic
       {/* Bio Plaque - positioned before first artwork */}
       <BioPlaque roomDepth={roomDepth} />
 
-      {/* Spotlights for each artwork - visual beam only, doesn't light artwork */}
+      {/* Spotlights - only every 3rd artwork on mobile to reduce GPU load */}
       {cards.map((card, index) => {
+        // On mobile, only show spotlight for every 3rd artwork
+        if (isMobile && index % 3 !== 0) return null
+        
         const xPos = index * 4
         return (
           <group key={card.id}>
-            {/* Visual spotlight beam - lights environment but not artwork directly */}
             <SpotLight
               position={[xPos, roomHeight - 2.2, 1]}
               angle={0.5}
               penumbra={0.8}
-              intensity={20}
+              intensity={isMobile ? 12 : 20}
               distance={8}
               color="#fff4e0"
               castShadow={false}
               target-position={[xPos, -0.5, -roomDepth / 2 + 0.3]}
-              // Target below artwork to light floor/wall area
             />
           </group>
         )
@@ -1175,7 +1191,7 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
           color="#ffffff"
         />
 
-        <GalleryRoom cards={cards} onCardClick={onCardClick} />
+        <GalleryRoom cards={cards} onCardClick={onCardClick} isMobile={isMobile} />
         
         <CameraController 
           cardsCount={cards.length} 
