@@ -1,7 +1,8 @@
-import { useState, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense, useMemo } from 'react'
 import { Header } from '@/components/Header'
 import { SearchFilter } from '@/components/SearchFilter'
 import { linkCards } from '@/data/cards'
+import { useSEO, getCategorySEO, generateGalleryJsonLd } from '@/hooks/useSEO'
 
 // Lazy load Gallery3D to reduce initial bundle size
 // This ensures Three.js and related libraries only load when the gallery is rendered
@@ -27,6 +28,26 @@ const Gallery3D = lazy(() =>
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
+
+  // Dynamic SEO based on active category
+  const seoContent = getCategorySEO(activeCategory)
+  
+  // Filter cards for JSON-LD
+  const filteredCards = useMemo(() => {
+    return linkCards.filter(card => 
+      activeCategory === 'All' || activeCategory === 'Contact' || card.category === activeCategory
+    )
+  }, [activeCategory])
+
+  // Generate JSON-LD structured data
+  const jsonLd = useMemo(() => generateGalleryJsonLd(filteredCards), [filteredCards])
+
+  // Apply SEO
+  useSEO({
+    title: seoContent.title,
+    description: seoContent.description,
+    jsonLd,
+  })
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
