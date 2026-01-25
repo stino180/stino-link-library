@@ -55,6 +55,10 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
   const texture = useTexture(imageUrl)
   const lastClickTime = useRef(0)
   
+  // Track pointer down position to distinguish click from drag
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null)
+  const DRAG_THRESHOLD = 5 // pixels - if moved more than this, it's a drag
+  
   // Configure texture for stability/performance.
   // NOTE: Avoid mutating texture.image dimensions directly (can cause black textures on some devices).
   useMemo(() => {
@@ -71,21 +75,29 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
   const frameDepth = 0.08
   const borderWidth = 0.12
 
-  // Disabled subtle animation for better performance - can re-enable if needed
-  // useFrame((state) => {
-  //   if (frameRef.current && state.camera) {
-  //     const distance = frameRef.current.position.distanceTo(state.camera.position)
-  //     if (distance < 15) {
-  //       const time = state.clock.elapsedTime
-  //       frameRef.current.position.y = Math.sin(time * 0.5 + position[0]) * 0.01
-  //     }
-  //   }
-  // })
+  // Track pointer down to detect drags vs clicks
+  const handlePointerDown = useCallback((e: any) => {
+    // Don't stop propagation - let OrbitControls receive the event
+    pointerDownPos.current = { x: e.clientX ?? e.nativeEvent?.clientX ?? 0, y: e.clientY ?? e.nativeEvent?.clientY ?? 0 }
+  }, [])
 
-  // Single click handler that prevents multiple triggers
-  const handleClick = useCallback((e: any) => {
-    e.stopPropagation()
-    // Debounce: prevent multiple clicks within 500ms
+  // Click handler that only fires if it wasn't a drag
+  const handlePointerUp = useCallback((e: any) => {
+    if (!pointerDownPos.current) return
+    
+    const upX = e.clientX ?? e.nativeEvent?.clientX ?? 0
+    const upY = e.clientY ?? e.nativeEvent?.clientY ?? 0
+    const deltaX = Math.abs(upX - pointerDownPos.current.x)
+    const deltaY = Math.abs(upY - pointerDownPos.current.y)
+    
+    pointerDownPos.current = null
+    
+    // If moved more than threshold, it was a drag - don't trigger click
+    if (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD) {
+      return
+    }
+    
+    // It was a click - debounce multiple clicks
     const now = Date.now()
     if (now - lastClickTime.current < 500) {
       return
@@ -101,13 +113,15 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
 
   const handlePointerOut = useCallback(() => {
     document.body.style.cursor = 'auto'
+    pointerDownPos.current = null // Reset on pointer out
   }, [])
 
   return (
     <group 
       ref={meshRef} 
       position={position} 
-      onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
     >
