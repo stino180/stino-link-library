@@ -55,19 +55,15 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
   const texture = useTexture(imageUrl)
   const lastClickTime = useRef(0)
   
-  // Configure texture for performance - aggressive optimization
+  // Configure texture for stability/performance.
+  // NOTE: Avoid mutating texture.image dimensions directly (can cause black textures on some devices).
   useMemo(() => {
     texture.colorSpace = THREE.SRGBColorSpace
-    texture.generateMipmaps = false // Disable mipmaps for faster loading
+    texture.generateMipmaps = false
     texture.minFilter = THREE.LinearFilter
     texture.magFilter = THREE.LinearFilter
-    texture.anisotropy = 1 // Minimum for best performance
-    // Resize texture if too large
-    if (texture.image && texture.image.width > 512) {
-      texture.image.width = 512
-      texture.image.height = 512
-      texture.needsUpdate = true
-    }
+    texture.anisotropy = 1
+    texture.needsUpdate = true
   }, [texture])
   
   const frameWidth = 2
@@ -127,17 +123,14 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
         <meshStandardMaterial color="#fafafa" roughness={0.9} />
       </mesh>
       
-      {/* Artwork canvas - self-illuminated, not affected by spotlights */}
+      {/* Artwork canvas - unlit material for consistent rendering across devices */}
       <mesh ref={frameRef} position={[0, 0, 0.02]} castShadow={false}>
         <planeGeometry args={[frameWidth, frameHeight]} />
-        <meshStandardMaterial 
-          map={texture} 
-          roughness={0.8}
-          metalness={0}
-          // Make artwork more self-contained, less affected by spotlights
-          emissive="#ffffff"
-          emissiveIntensity={0.3}
-          emissiveMap={texture}
+        <meshBasicMaterial
+          map={texture}
+          toneMapped={false}
+          transparent
+          alphaTest={0.01}
         />
       </mesh>
       
