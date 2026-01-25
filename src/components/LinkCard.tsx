@@ -2,37 +2,43 @@ import { ArrowUpRight } from 'lucide-react'
 import { Badge } from './Badge'
 import { LinkCard as LinkCardType } from '@/data/cards'
 
-// Import all card images
+// Import all card images - matching actual asset files
 import musicImg from '@/assets/music.jpg'
-import youtubeImg from '@/assets/youtube.jpg'
+import recordingsImg from '@/assets/180recordings.jpg'
 import portfolioImg from '@/assets/portfolio.jpg'
-import bookingImg from '@/assets/booking.jpg'
+import viziImg from '@/assets/vizi_test.png'
 import merchImg from '@/assets/merch.jpg'
-import liquidnotesImg from '@/assets/liquidnotes.jpg'
-import bridgeImg from '@/assets/bridge.jpg'
-import tiktokImg from '@/assets/tiktok.jpg'
-import instagramImg from '@/assets/instagram.jpg'
+import mozzeImg from '@/assets/mozze.png'
+import stinoImg from '@/assets/stino-logo.png'
+import tiktokImg from '@/assets/tiktok.png'
+import instagramImg from '@/assets/ig.jfif'
 import twitterImg from '@/assets/twitter.jpg'
+import youtubeImg from '@/assets/youtube.png'
+import dcaImg from '@/assets/dca.png'
 
-const imageMap = {
+// Map card image keys to actual imported assets
+const imageMap: Record<string, string> = {
   music: musicImg,
-  youtube: youtubeImg,
+  recordings: recordingsImg,
   portfolio: portfolioImg,
-  booking: bookingImg,
+  booking: viziImg, // Vizi uses "booking" key in cards.ts
   merch: merchImg,
-  liquidnotes: liquidnotesImg,
-  bridge: bridgeImg,
+  mozze: mozzeImg,
+  stino: stinoImg,
   tiktok: tiktokImg,
   instagram: instagramImg,
   twitter: twitterImg,
+  youtube: youtubeImg,
+  stackflow: dcaImg,
 }
 
 interface LinkCardProps {
   card: LinkCardType
   index: number
+  priority?: boolean // For LCP optimization
 }
 
-export function LinkCard({ card, index }: LinkCardProps) {
+export function LinkCard({ card, index, priority = false }: LinkCardProps) {
   const handleClick = () => {
     if (card.href.startsWith('mailto:')) {
       window.location.href = card.href
@@ -43,7 +49,7 @@ export function LinkCard({ card, index }: LinkCardProps) {
     }
   }
 
-  const imageUrl = imageMap[card.image as keyof typeof imageMap] || musicImg
+  const imageUrl = imageMap[card.image] || musicImg
 
   return (
     <article
@@ -67,8 +73,12 @@ export function LinkCard({ card, index }: LinkCardProps) {
           <img
             src={imageUrl}
             alt={card.title}
+            width={280}
+            height={350}
             className="w-full h-full object-cover transition-transform duration-700 ease-museum group-hover:scale-105"
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            decoding={priority ? 'sync' : 'async'}
+            fetchPriority={priority ? 'high' : 'auto'}
           />
           
           {/* Hover Overlay */}
