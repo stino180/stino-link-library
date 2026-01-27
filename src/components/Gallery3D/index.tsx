@@ -1,8 +1,9 @@
 import { Suspense, useState, useEffect, useCallback, lazy } from 'react'
 import { LinkCard as LinkCardType } from '@/data/cards'
 import { GallerySkeleton } from '@/components/GallerySkeleton'
+import { Gallery2D } from '@/components/Gallery2D'
 
-// Lazy load GalleryScene to defer Three.js bundle
+// Lazy load GalleryScene to defer Three.js bundle - only for desktop
 const GalleryScene = lazy(() => 
   import('./GalleryScene').then(module => ({ default: module.GalleryScene }))
 )
@@ -13,6 +14,32 @@ interface Gallery3DProps {
   activeCategory: string
 }
 
+// Detect if device should use 2D mode (mobile/slow devices)
+function shouldUse2DMode(): boolean {
+  if (typeof window === 'undefined') return false
+  
+  // Check for mobile/tablet via screen width
+  const isMobileScreen = window.innerWidth < 768
+  
+  // Check for low-end device via hardware concurrency
+  const isLowEndDevice = navigator.hardwareConcurrency !== undefined && navigator.hardwareConcurrency <= 4
+  
+  // Check for slow connection
+  const connection = (navigator as any).connection
+  const isSlowConnection = connection && (
+    connection.saveData === true ||
+    connection.effectiveType === 'slow-2g' ||
+    connection.effectiveType === '2g' ||
+    connection.effectiveType === '3g'
+  )
+  
+  // Check for reduced motion preference
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  
+  // Use 2D on mobile screens, slow connections, or if user prefers reduced motion
+  return isMobileScreen || isSlowConnection || prefersReducedMotion
+}
+
 function LoadingScreen() {
   return <GallerySkeleton />
 }
@@ -20,15 +47,25 @@ function LoadingScreen() {
 export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps) {
   const [shouldLoad3D, setShouldLoad3D] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [use2DMode, setUse2DMode] = useState(false)
+  const [modeChecked, setModeChecked] = useState(false)
 
-  // Defer 3D loading until after initial paint using requestIdleCallback
+  // Check device capabilities on mount
   useEffect(() => {
-    // Use requestIdleCallback to load 3D after browser is idle
+    const use2D = shouldUse2DMode()
+    setUse2DMode(use2D)
+    setModeChecked(true)
+    
+    // If using 2D mode, skip 3D loading entirely
+    if (use2D) {
+      setIsTransitioning(true)
+      return
+    }
+    
+    // For 3D mode, defer loading until after initial paint
     const loadAfterIdle = () => {
-      // Small delay to ensure skeleton is painted first
       const timer = setTimeout(() => {
         setIsTransitioning(true)
-        // Another small delay for transition effect
         setTimeout(() => {
           setShouldLoad3D(true)
         }, 100)
@@ -40,20 +77,18 @@ export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps
       const id = (window as any).requestIdleCallback(loadAfterIdle, { timeout: 2000 })
       return () => (window as any).cancelIdleCallback(id)
     } else {
-      // Fallback for Safari - load after 100ms
       const timer = setTimeout(loadAfterIdle, 100)
       return () => clearTimeout(timer)
     }
   }, [])
 
-  // Filter cards - Contact category is special, it shows all cards but moves camera to bio plaque
+  // Filter cards
   const filteredCards = cards.filter((card) => {
     const matchesSearch =
       searchQuery === '' ||
       card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       card.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
     
-    // Contact category doesn't filter - it just moves camera to bio plaque
     const matchesCategory =
       activeCategory === 'All' || 
       activeCategory === 'Contact' || 
@@ -72,7 +107,7 @@ export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps
     }
   }, [])
 
-  // Don't show "No works found" for Contact category - it's special
+  // Don't show "No works found" for Contact category
   if (filteredCards.length === 0 && activeCategory !== 'Contact') {
     return (
       <div className="w-full h-full flex items-center justify-center bg-background">
@@ -84,6 +119,24 @@ export function Gallery3D({ cards, searchQuery, activeCategory }: Gallery3DProps
             Try adjusting your search or filter
           </p>
         </div>
+      </div>
+    )
+  }
+
+  // Wait until mode is checked
+  if (!modeChecked) {
+    return <LoadingScreen />
+  }
+
+  // Use lightweight 2D gallery on mobile/slow devices
+  if (use2DMode) {
+    return (
+      <div className={`w-full h-full transition-opacity duration-300 ${isTransitioning ? 'opacity-100' : 'opacity-0'}`}>
+        <Gallery2D
+          cards={cards}
+          searchQuery={searchQuery}
+          activeCategory={activeCategory}
+        />
       </div>
     )
   }
