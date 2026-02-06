@@ -165,17 +165,11 @@ export function Gallery2D({ cards, searchQuery, activeCategory }: Gallery2DProps
                     </div>
                   </div>
 
-                  {/* Placard */}
+                  {/* Placard - title only */}
                   <div className="mt-2 bg-white/95 p-2 rounded-sm">
-                    <h2 className="text-xs md:text-sm font-medium text-neutral-900 truncate">
+                    <h2 className="text-sm md:text-base font-medium text-neutral-900 truncate text-center">
                       {card.title}
                     </h2>
-                    <p className="text-[10px] md:text-xs text-neutral-600 truncate mt-0.5">
-                      {card.subtitle}
-                    </p>
-                    <span className="text-[9px] text-neutral-400 uppercase tracking-wider mt-1 block">
-                      {card.category}
-                    </span>
                   </div>
                 </div>
               </article>

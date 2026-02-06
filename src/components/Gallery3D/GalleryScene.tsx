@@ -148,16 +148,22 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
         />
       </mesh>
       
-      {/* Enhanced placard background - wider to fit longer text */}
-      <group position={[0, -frameHeight / 2 - 0.5, 0.01]}>
+      {/* Enhanced placard background - clickable area including title */}
+      <group 
+        position={[0, -frameHeight / 2 - 0.35, 0.01]}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
         {/* Subtle shadow layer for depth */}
         <mesh position={[0, 0, -0.002]}>
-          <planeGeometry args={[2.1, 0.7]} />
+          <planeGeometry args={[2.1, 0.5]} />
           <meshStandardMaterial color="#000000" opacity={0.2} transparent />
         </mesh>
-        {/* Main placard - wider to accommodate longer titles and subtitles */}
+        {/* Main placard - clickable */}
         <mesh>
-          <planeGeometry args={[2.0, 0.65]} />
+          <planeGeometry args={[2.0, 0.45]} />
           <meshStandardMaterial 
             color="#ffffff" 
             roughness={0.1} 
@@ -168,7 +174,7 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
         </mesh>
         {/* Subtle border for definition */}
         <mesh position={[0, 0, 0.001]}>
-          <planeGeometry args={[2.0, 0.65]} />
+          <planeGeometry args={[2.0, 0.45]} />
           <meshStandardMaterial 
             color="#e0e0e0" 
             opacity={0.3} 
@@ -178,10 +184,10 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
         </mesh>
       </group>
       
-      {/* Title text - centered */}
+      {/* Title text only - centered on placard */}
       <Text
-        position={[0, -frameHeight / 2 - 0.36, 0.02]}
-        fontSize={0.16}
+        position={[0, -frameHeight / 2 - 0.35, 0.02]}
+        fontSize={0.18}
         color="#0a0a0a"
         anchorX="center"
         anchorY="middle"
@@ -193,22 +199,6 @@ function ArtworkFrame({ card, position, onClick }: ArtworkFrameProps) {
         letterSpacing={0.015}
       >
         {card.title}
-      </Text>
-      
-      {/* Subtitle text - centered */}
-      <Text
-        position={[0, -frameHeight / 2 - 0.56, 0.02]}
-        fontSize={0.11}
-        color="#2a2a2a"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={1.85}
-        outlineWidth={0.03}
-        outlineColor="#ffffff"
-        renderOrder={3}
-        letterSpacing={0.008}
-      >
-        {card.subtitle}
       </Text>
     </group>
   )
@@ -1033,9 +1023,10 @@ export function GalleryScene({ cards, onCardClick, activeCategory }: GalleryScen
     const normalizedY = y / maxDistance
     
     // Update rotation ref (azimuth = horizontal, polar = vertical)
+    // Invert X so moving joystick left rotates camera left (natural direction)
     if (joystickRotationRef) {
       joystickRotationRef.current = {
-        azimuth: normalizedX,
+        azimuth: -normalizedX,
         polar: normalizedY
       }
     }
