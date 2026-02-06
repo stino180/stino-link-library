@@ -93,19 +93,11 @@ export function LinkCard({ card, index, priority = false }: LinkCardProps) {
         </div>
       </div>
 
-      {/* Museum Placard - Small label below artwork */}
-      <div className="mt-6 space-y-1 text-center max-w-[280px] md:max-w-[320px]">
+      {/* Museum Placard - Title only */}
+      <div className="mt-6 text-center max-w-[280px] md:max-w-[320px]">
         <h2 className="font-serif text-base md:text-lg font-medium text-foreground group-hover:text-foreground/80 transition-colors">
           {card.title}
         </h2>
-        <p className="text-xs tracking-wide text-muted-foreground font-light">
-          {card.subtitle}
-        </p>
-        <div className="pt-0.5">
-          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/60">
-            {card.category}
-          </span>
-        </div>
       </div>
     </article>
   )
