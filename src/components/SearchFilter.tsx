@@ -17,7 +17,7 @@ export function SearchFilter({
   onCategoryChange,
 }: SearchFilterProps) {
   return (
-    <div className="flex flex-col items-center gap-8 mb-20">
+    <div className="flex flex-col items-center gap-3 md:gap-8 mb-8 md:mb-20">
       {/* Search */}
       <div className="relative w-full max-w-md">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

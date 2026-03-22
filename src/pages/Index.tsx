@@ -37,7 +37,7 @@ const Index = () => {
       </div>
       
       {/* Search and Filters - Fixed overlay, responsive for mobile */}
-      <div className="absolute top-16 md:top-20 left-0 right-0 z-40 px-3 md:px-6 lg:px-12 py-2 md:py-4">
+      <div className="absolute top-14 md:top-20 left-0 right-0 z-40 px-3 md:px-6 lg:px-12 py-1 md:py-4">
         <SearchFilter
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}

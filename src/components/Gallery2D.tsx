@@ -110,7 +110,7 @@ export function Gallery2D({ cards, searchQuery, activeCategory }: Gallery2DProps
         className="h-full overflow-x-auto overflow-y-hidden scrollbar-hide"
         style={{ scrollSnapType: 'x mandatory' }}
       >
-        <div className="h-full flex items-center gap-6 md:gap-8 px-6 py-8">
+        <div className="h-full flex items-end md:items-center gap-6 md:gap-8 px-6 pb-16 pt-8 md:py-8">
           {/* Leading spacer */}
           <div className="shrink-0 w-4" />
 
